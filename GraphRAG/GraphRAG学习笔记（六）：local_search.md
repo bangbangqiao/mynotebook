@@ -30,11 +30,11 @@ python -m graphrag query --query "萧炎是谁？" --method local --root ./graph
 
 `default-community-full_content.lance`中的内容：
 
-![image-20250529204727426](D:\WorkPlace\Github\mynotebook\GraphRAG\img\image-20250529204727426.png)
+![image-20250529204727426](./img/image-20250529204727426.png)
 
 `default-entity-description.lance`和`default-text_unit-text.lance`中的内容：
 
-![image-20250529204907432](D:\WorkPlace\Github\mynotebook\GraphRAG\img\image-20250529204907432.png)
+![image-20250529204907432](.\img\image-20250529204907432.png)
 
 从上面的图，可以看到有一列的名字是`vector`，其存储的就是`text`的语义向量，local search阶段的相似性检索靠的就是它。
 
@@ -231,11 +231,11 @@ description_embedding_store = get_embedding_store(
 entities_ = read_indexer_entities(entities, communities, community_level)
 ~~~
 
-![image-20250530101845173](D:\WorkPlace\Github\mynotebook\GraphRAG\img\image-20250530101845173.png)
+![image-20250530101845173](.\img\image-20250530101845173.png)
 
 在明确了要在`default-entity-description`中进行检索，下面可以进行检索了。其逻辑主要在graphrag.query.context_builder.entity_extraction.py的map_query_to_entities函数中。对实体的检索主要发生在similarity_search_by_text里面，实际就是上面LanceDBVectorStore类的similarity_search_by_text方法。其检索返回的结果就是存储在`default-entity-description`的数据。**在这里向量化数据库的使命就结束了，采用向量化数据的目的就是通过语义的相似性检索出与query相关的实体。**
 
-![image-20250529215150968](D:\WorkPlace\Github\mynotebook\GraphRAG\img\image-20250529214246760.png)
+![image-20250529215150968](.\img\image-20250529214246760.png)
 
 但是只有上面的信息还远远不够的，因为在index阶段，我们获得了很多其他的信息，如`relationship`,`text_unit`等，这些信息我们都应该利用起来，这也是graphrag比rag强大的原因之一。
 
@@ -257,7 +257,7 @@ for result in search_results:
         matched_entities.append(matched)
 ~~~
 
-![image-20250530103713988](D:\WorkPlace\Github\mynotebook\GraphRAG\img\image-20250530103713988.png)
+![image-20250530103713988](.\img\image-20250530103713988.png)
 
 ### 第二步：根据实体检索出社区信息。
 
@@ -304,7 +304,7 @@ selected_communities.sort(
 )
 ~~~
 
-![image-20250530105147772](D:\WorkPlace\Github\mynotebook\GraphRAG\img\image-20250530105147772.png)
+![image-20250530105147772](.\img\image-20250530105147772.png)
 
 ### 第三步：根据实体信息检索出与其相关的关系
 
@@ -324,7 +324,7 @@ local_context, local_context_data = self._build_local_context(
 )
 ~~~
 
-![image-20250530105415315](D:\WorkPlace\Github\mynotebook\GraphRAG\img\image-20250530105415315.png)
+![image-20250530105415315](.\img\image-20250530105415315.png)
 
 ### 第四步：根据实体信息检索与其相关的段落
 
@@ -338,7 +338,7 @@ text_unit_context, text_unit_context_data = self._build_text_unit_context(
         )
 ~~~
 
-![image-20250530110451903](D:\WorkPlace\Github\mynotebook\GraphRAG\img\image-20250530110451903.png)
+![image-20250530110451903](.\img\image-20250530110451903.png)
 
 到此为止，local search已经检索到了其想要的全部信息，下一步就是把它填入提示词模板，结合`query`与大模型进行交互了。
 
